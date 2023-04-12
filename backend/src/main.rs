@@ -1,4 +1,5 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
+mod users;
 
 #[get("/health")]
 async fn healthcheck() -> impl Responder {
@@ -7,8 +8,14 @@ async fn healthcheck() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(healthcheck))
-        .bind(("127.0.0.1", 8000))?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new().service(
+            web::scope("/api")
+                .service(healthcheck)
+                .configure(users::handlers::config),
+        )
+    })
+    .bind(("127.0.0.1", 8000))?
+    .run()
+    .await
 }
