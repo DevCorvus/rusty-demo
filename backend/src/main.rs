@@ -1,5 +1,6 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-mod users;
+use backend::{database, users};
+use dotenvy::dotenv;
 
 #[get("/health")]
 async fn healthcheck() -> impl Responder {
@@ -8,8 +9,12 @@ async fn healthcheck() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new().service(
+    dotenv().ok();
+
+    let pool = database::connect_sqlite();
+
+    HttpServer::new(move || {
+        App::new().app_data(web::Data::new(pool.clone())).service(
             web::scope("/api")
                 .service(healthcheck)
                 .configure(users::handlers::config),
