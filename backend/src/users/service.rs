@@ -1,4 +1,5 @@
 use crate::database::DbError;
+
 use diesel::{
     dsl::{exists, select},
     prelude::*,
@@ -30,9 +31,16 @@ pub fn add_user(conn: &mut SqliteConnection, data: &CreateUserDto) -> Result<Use
     Ok(new_user)
 }
 
-pub fn check_if_user_exists(conn: &mut SqliteConnection, user_id: i32) -> Result<bool, DbError> {
+pub fn user_exists_by_id(conn: &mut SqliteConnection, user_id: i32) -> Result<bool, DbError> {
     use crate::schema::users::dsl::*;
     let user_exists = select(exists(users.find(user_id))).get_result::<bool>(conn)?;
+
+    Ok(user_exists)
+}
+
+pub fn user_exists_by_email(conn: &mut SqliteConnection, value: String) -> Result<bool, DbError> {
+    use crate::schema::users::dsl::*;
+    let user_exists = select(exists(users.filter(email.eq(&value)))).get_result::<bool>(conn)?;
 
     Ok(user_exists)
 }
