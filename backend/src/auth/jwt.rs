@@ -6,8 +6,8 @@ use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JwtClaims {
-    sub: String,
-    exp: usize,
+    pub sub: String,
+    pub exp: usize,
 }
 
 pub fn encode_jwt(user_id: i32) -> anyhow::Result<String> {

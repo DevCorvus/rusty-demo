@@ -3,9 +3,7 @@ use actix_web::{post, web, HttpResponse, Responder};
 
 use serde_json::json;
 
-use crate::jwt::encode_jwt;
-
-use super::dto::LoginDto;
+use super::{dto::LoginDto, jwt::encode_jwt};
 use crate::{database::DbPool, error::AppError};
 
 #[post("/login")]

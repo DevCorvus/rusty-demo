@@ -1,12 +1,12 @@
-use crate::database::DbPool;
 use crate::password;
+use crate::{auth::middleware, database::DbPool};
 
 use super::{dto::CreateUserDto, service};
 use crate::error::AppError;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 
 #[get("/profile")]
-async fn get_user_profile() -> impl Responder {
+async fn get_user_profile(_: middleware::JwtMiddleware) -> impl Responder {
     HttpResponse::Ok().body("User profile")
 }
 
@@ -43,12 +43,12 @@ async fn create_user(
 }
 
 #[put("/")]
-async fn update_user() -> impl Responder {
+async fn update_user(_: middleware::JwtMiddleware) -> impl Responder {
     HttpResponse::Ok().body("Update user")
 }
 
 #[delete("/")]
-async fn delete_user() -> impl Responder {
+async fn delete_user(_: middleware::JwtMiddleware) -> impl Responder {
     HttpResponse::Ok().body("Delete user")
 }
 
