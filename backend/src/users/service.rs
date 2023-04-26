@@ -43,6 +43,24 @@ pub fn add_user(conn: &mut SqliteConnection, data: &CreateUserDto) -> Result<Use
     Ok(new_user)
 }
 
+pub fn update_user_password(
+    conn: &mut SqliteConnection,
+    user_id: i32,
+    new_password_hash: String,
+) -> Result<(), DbError> {
+    use crate::schema::users::dsl::*;
+    diesel::update(users.filter(id.eq(user_id)))
+        .set(password.eq(new_password_hash))
+        .execute(conn)?;
+    Ok(())
+}
+
+pub fn delete_user(conn: &mut SqliteConnection, user_id: i32) -> Result<(), DbError> {
+    use crate::schema::users::dsl::*;
+    diesel::delete(users.filter(id.eq(user_id))).execute(conn)?;
+    Ok(())
+}
+
 pub fn user_exists_by_id(conn: &mut SqliteConnection, user_id: i32) -> Result<bool, DbError> {
     use crate::schema::users::dsl::*;
     let user_exists = select(exists(users.find(user_id))).get_result::<bool>(conn)?;
