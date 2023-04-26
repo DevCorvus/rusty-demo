@@ -1,5 +1,5 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use backend::{database, users};
+use backend::{auth, database, users};
 use dotenvy::dotenv;
 
 #[get("/health")]
@@ -17,7 +17,8 @@ async fn main() -> std::io::Result<()> {
         App::new().app_data(web::Data::new(pool.clone())).service(
             web::scope("/api")
                 .service(healthcheck)
-                .configure(users::handlers::config),
+                .configure(users::handlers::config)
+                .configure(auth::handlers::config),
         )
     })
     .bind(("127.0.0.1", 8000))?
