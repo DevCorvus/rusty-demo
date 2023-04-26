@@ -13,10 +13,22 @@ pub fn get_all_users(conn: &mut SqliteConnection) -> Result<Vec<User>, DbError> 
     Ok(all_users)
 }
 
-pub fn get_user(conn: &mut SqliteConnection, user_id: i32) -> Result<Option<User>, DbError> {
+pub fn get_user_by_id(conn: &mut SqliteConnection, user_id: i32) -> Result<Option<User>, DbError> {
     use crate::schema::users::dsl::*;
     let user = users
         .filter(id.eq(user_id))
+        .first::<User>(conn)
+        .optional()?;
+    Ok(user)
+}
+
+pub fn get_user_by_email(
+    conn: &mut SqliteConnection,
+    user_email: String,
+) -> Result<Option<User>, DbError> {
+    use crate::schema::users::dsl::*;
+    let user = users
+        .filter(email.eq(user_email))
         .first::<User>(conn)
         .optional()?;
     Ok(user)
@@ -38,9 +50,13 @@ pub fn user_exists_by_id(conn: &mut SqliteConnection, user_id: i32) -> Result<bo
     Ok(user_exists)
 }
 
-pub fn user_exists_by_email(conn: &mut SqliteConnection, value: String) -> Result<bool, DbError> {
+pub fn user_exists_by_email(
+    conn: &mut SqliteConnection,
+    user_email: String,
+) -> Result<bool, DbError> {
     use crate::schema::users::dsl::*;
-    let user_exists = select(exists(users.filter(email.eq(&value)))).get_result::<bool>(conn)?;
+    let user_exists =
+        select(exists(users.filter(email.eq(&user_email)))).get_result::<bool>(conn)?;
 
     Ok(user_exists)
 }
