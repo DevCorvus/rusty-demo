@@ -1,11 +1,16 @@
+use frontend::layout::Layout;
+use frontend::router::{switch, Route};
 use yew::prelude::*;
+use yew_router::prelude::*;
 
-#[function_component]
-fn App() -> Html {
+#[function_component(App)]
+fn app() -> Html {
     html! {
-        <div class={classes!("text-orange-500", "text-3xl")}>
-            <h1>{ "Rusty demo" }</h1>
-        </div>
+        <BrowserRouter>
+            <Layout>
+                <Switch<Route> render={switch} />
+            </Layout>
+        </BrowserRouter>
     }
 }
 
