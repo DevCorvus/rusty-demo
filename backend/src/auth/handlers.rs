@@ -1,9 +1,9 @@
 use crate::{password::compare_password, users};
 use actix_web::{post, web, HttpResponse, Responder};
 
-use serde_json::json;
+use common::{LoginDto, LoginResponse};
 
-use super::{dto::LoginDto, jwt::encode_jwt};
+use super::jwt::encode_jwt;
 use crate::{database::DbPool, error::AppError};
 
 #[post("/login")]
@@ -31,7 +31,9 @@ async fn login(
 
     if do_passwords_match {
         let token = encode_jwt(user.id).map_err(|_| AppError::InternalError)?;
-        Ok(HttpResponse::Created().json(json!({ "token": token })))
+        Ok(HttpResponse::Created().json(LoginResponse {
+            access_token: token,
+        }))
     } else {
         Err(AppError::Unauthorized.into())
     }

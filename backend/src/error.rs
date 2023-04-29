@@ -2,7 +2,7 @@ use actix_web::{
     http::{header::ContentType, StatusCode},
     HttpResponse, ResponseError,
 };
-use serde_json::json;
+use common::ErrorResponse;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -21,10 +21,10 @@ impl ResponseError for AppError {
     fn error_response(&self) -> HttpResponse<actix_web::body::BoxBody> {
         HttpResponse::build(self.status_code())
             .insert_header(ContentType::json())
-            .json(json!({
-                "message": self.to_string(),
-                "status": self.status_code().as_u16(),
-            }))
+            .json(ErrorResponse {
+                message: self.to_string(),
+                status: self.status_code().as_u16() as usize,
+            })
     }
     fn status_code(&self) -> actix_web::http::StatusCode {
         match *self {

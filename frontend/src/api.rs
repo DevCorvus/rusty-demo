@@ -1,22 +1,46 @@
+use common::{ErrorResponse, LoginDto, LoginResponse};
 use reqwasm::http;
-use serde::Deserialize;
+use serde_json;
+use thiserror::Error;
 
 static API_URL: &str = "http://localhost:8000/api";
 
-#[derive(Deserialize)]
-pub struct LoginResponse {
-    pub token: String,
+#[derive(Error, Debug)]
+enum RequestError {
+    #[error("Failed to make request")]
+    Failed,
+    #[error("Failed to parse dto")]
+    ParseDtoFailed,
+    #[error("Failed to parse response")]
+    ParseResponseFailed,
+    #[error("Failed to parse error response")]
+    ParseErrorResponseFailed,
 }
 
-pub async fn api_login(data: &str) -> Result<LoginResponse, String> {
+pub async fn api_login(data: LoginDto) -> Result<LoginResponse, String> {
+    let parsed_data =
+        serde_json::to_string(&data).map_err(|_| RequestError::ParseDtoFailed.to_string())?;
+
     let res = http::Request::post(format!("{}/auth/login", API_URL).as_str())
         .header("Content-Type", "application/json")
-        .body(data)
+        .body(parsed_data)
         .send()
         .await
-        .unwrap();
+        .map_err(|_| RequestError::Failed.to_string())?;
 
-    let res_json = res.json::<LoginResponse>().await.unwrap();
+    if res.status() != 201 {
+        let err_res = res
+            .json::<ErrorResponse>()
+            .await
+            .map_err(|_| RequestError::ParseErrorResponseFailed.to_string())?;
+
+        return Err(err_res.message);
+    }
+
+    let res_json = res
+        .json::<LoginResponse>()
+        .await
+        .map_err(|_| RequestError::ParseResponseFailed.to_string())?;
 
     Ok(res_json)
 }

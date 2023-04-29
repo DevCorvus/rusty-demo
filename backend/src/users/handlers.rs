@@ -1,14 +1,10 @@
 use crate::password;
 use crate::{auth::middleware, database::DbPool};
 
-use super::{
-    dto::CreateUserDto,
-    dto::{FilteredUserDto, UpdateUserPasswordDto},
-    model::User,
-    service,
-};
+use super::{dto::CreateUserDto, model::User, service};
 use crate::error::AppError;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use common::{UpdateUserPasswordDto, UserResponse};
 
 #[get("/profile")]
 async fn get_user_profile(
@@ -95,8 +91,8 @@ async fn delete_user(
     Ok(HttpResponse::Ok().body("User deleted successfully"))
 }
 
-fn filter_user_output(user: &User) -> FilteredUserDto {
-    FilteredUserDto {
+fn filter_user_output(user: &User) -> UserResponse {
+    UserResponse {
         id: user.id,
         email: user.email.to_owned(),
         created_at: user.created_at,
