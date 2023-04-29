@@ -1,4 +1,4 @@
-use common::{ErrorResponse, LoginDto, LoginResponse};
+use common::{CreateUserDto, ErrorResponse, LoginDto, LoginResponse};
 use reqwasm::http;
 use serde_json;
 use thiserror::Error;
@@ -43,4 +43,27 @@ pub async fn api_login(data: LoginDto) -> Result<LoginResponse, String> {
         .map_err(|_| RequestError::ParseResponseFailed.to_string())?;
 
     Ok(res_json)
+}
+
+pub async fn api_add_user(data: CreateUserDto) -> Result<(), String> {
+    let parsed_data =
+        serde_json::to_string(&data).map_err(|_| RequestError::ParseDtoFailed.to_string())?;
+
+    let res = http::Request::post(format!("{}/users/", API_URL).as_str())
+        .header("Content-Type", "application/json")
+        .body(parsed_data)
+        .send()
+        .await
+        .map_err(|_| RequestError::Failed.to_string())?;
+
+    if res.status() != 201 {
+        let err_res = res
+            .json::<ErrorResponse>()
+            .await
+            .map_err(|_| RequestError::ParseErrorResponseFailed.to_string())?;
+
+        return Err(err_res.message);
+    }
+
+    Ok(())
 }
