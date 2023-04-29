@@ -32,7 +32,7 @@ async fn create_user(
     pool: web::Data<DbPool>,
     data: web::Json<CreateUserDto>,
 ) -> actix_web::Result<impl Responder> {
-    let new_user = web::block(move || {
+    let _ = web::block(move || {
         let mut conn = pool.get().map_err(|_| AppError::InternalError)?;
 
         let user_already_exists = service::user_exists_by_email(&mut conn, data.email.clone())
@@ -56,7 +56,7 @@ async fn create_user(
     })
     .await??;
 
-    Ok(HttpResponse::Created().json(filter_user_output(&new_user)))
+    Ok(HttpResponse::Created().body("User created successfully"))
 }
 
 #[put("/")]
