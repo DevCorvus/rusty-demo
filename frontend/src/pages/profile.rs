@@ -2,7 +2,10 @@ use chrono::{Local, TimeZone};
 use chrono_humanize::HumanTime;
 use yew::prelude::*;
 
-use crate::hooks::use_profile;
+use crate::{
+    components::{delete_account::DeleteAccount, update_password::UpdatePassword},
+    hooks::use_profile,
+};
 
 #[function_component(Content)]
 fn content() -> HtmlResult {
@@ -20,12 +23,16 @@ fn content() -> HtmlResult {
     );
 
     Ok(html! {
-        <div class="text-center text-slate-100">
-            <p class="text-lg font-semibold ">{user_profile.email}</p>
-            <div class="mt-4 text-sm text-slate-600">
-                <p>{member_since}</p>
-                <p>{last_update_since}</p>
+        <div class="flex flex-col gap-4">
+            <div class="text-center text-slate-100">
+                <p class="text-lg font-semibold ">{user_profile.email}</p>
+                <div class="mt-4 text-sm text-slate-600">
+                    <p>{member_since}</p>
+                    <p>{last_update_since}</p>
+                </div>
             </div>
+            <UpdatePassword />
+            <DeleteAccount />
         </div>
     })
 }

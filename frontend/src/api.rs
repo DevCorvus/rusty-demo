@@ -1,4 +1,6 @@
-use common::{CreateUserDto, ErrorResponse, LoginDto, LoginResponse, UserResponse};
+use common::{
+    CreateUserDto, ErrorResponse, LoginDto, LoginResponse, UpdateUserPasswordDto, UserResponse,
+};
 use reqwasm::http;
 use serde_json;
 use thiserror::Error;
@@ -91,4 +93,50 @@ pub async fn api_get_user_profile(token: &str) -> Result<UserResponse, String> {
         .map_err(|_| RequestError::ParseResponseFailed.to_string())?;
 
     Ok(res_json)
+}
+
+pub async fn api_update_user_password(
+    token: &str,
+    data: UpdateUserPasswordDto,
+) -> Result<(), String> {
+    let parsed_data =
+        serde_json::to_string(&data).map_err(|_| RequestError::ParseDtoFailed.to_string())?;
+
+    let res = http::Request::put(format!("{}/users/", API_URL).as_str())
+        .header("Content-Type", "application/json")
+        .header("Authorization", format!("Bearer {}", token).as_str())
+        .body(parsed_data)
+        .send()
+        .await
+        .map_err(|_| RequestError::Failed.to_string())?;
+
+    if res.status() != 200 {
+        let err_res = res
+            .json::<ErrorResponse>()
+            .await
+            .map_err(|_| RequestError::ParseErrorResponseFailed.to_string())?;
+
+        return Err(err_res.message);
+    }
+
+    Ok(())
+}
+
+pub async fn api_delete_user(token: &str) -> Result<(), String> {
+    let res = http::Request::delete(format!("{}/users/", API_URL).as_str())
+        .header("Authorization", format!("Bearer {}", token).as_str())
+        .send()
+        .await
+        .map_err(|_| RequestError::Failed.to_string())?;
+
+    if res.status() != 200 {
+        let err_res = res
+            .json::<ErrorResponse>()
+            .await
+            .map_err(|_| RequestError::ParseErrorResponseFailed.to_string())?;
+
+        return Err(err_res.message);
+    }
+
+    Ok(())
 }
