@@ -1,6 +1,6 @@
 use crate::{
     router::Route,
-    store::{set_token, Store},
+    store::{set_profile, set_token, Store},
 };
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -17,7 +17,8 @@ pub fn log_out() -> Html {
         Callback::from(move |_| {
             let dispatch = dispatch.clone();
 
-            set_token(None, dispatch);
+            set_token(None, dispatch.to_owned());
+            set_profile(None, dispatch.to_owned());
             navigator.push(&Route::Home);
         })
     };

@@ -1,4 +1,4 @@
-use common::{CreateUserDto, ErrorResponse, LoginDto, LoginResponse};
+use common::{CreateUserDto, ErrorResponse, LoginDto, LoginResponse, UserResponse};
 use reqwasm::http;
 use serde_json;
 use thiserror::Error;
@@ -66,4 +66,29 @@ pub async fn api_add_user(data: CreateUserDto) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+pub async fn api_get_user_profile(token: &str) -> Result<UserResponse, String> {
+    let res = http::Request::get(format!("{}/users/profile", API_URL).as_str())
+        .header("Content-Type", "application/json")
+        .header("Authorization", format!("Bearer {}", token).as_str())
+        .send()
+        .await
+        .map_err(|_| RequestError::Failed.to_string())?;
+
+    if res.status() != 200 {
+        let err_res = res
+            .json::<ErrorResponse>()
+            .await
+            .map_err(|_| RequestError::ParseErrorResponseFailed.to_string())?;
+
+        return Err(err_res.message);
+    }
+
+    let res_json = res
+        .json::<UserResponse>()
+        .await
+        .map_err(|_| RequestError::ParseResponseFailed.to_string())?;
+
+    Ok(res_json)
 }
