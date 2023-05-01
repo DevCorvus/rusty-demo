@@ -47,7 +47,7 @@ pub fn delete_account() -> Html {
     html! {
         <form onsubmit={on_submit} class="flex flex-col items-center gap-1">
             <div>
-                <button type="submit" class="transition text-rose-500 hover:text-rose-400">{"Delete account"}</button>
+                <button type="submit" class="transition text-rose-500 focus:text-rose-400 hover:text-rose-400">{"Delete account"}</button>
             </div>
             {if let Some(msg) = err_message.as_ref() {
                     html! {

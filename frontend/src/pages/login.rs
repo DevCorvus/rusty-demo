@@ -70,7 +70,7 @@ pub fn login() -> Html {
                     <input type="password" oninput={on_password_input} required={true} class="p-2 rounded-md" name="password" id="password" placeholder="Enter your password" />
                 </div>
                 <div class="mt-2">
-                    <button type="submit" class="p-2 bg-orange-500 rounded-md">{ "Submit" }</button>
+                    <button type="submit" class="p-2 transition bg-orange-500 rounded-md focus:bg-orange-400 hover:bg-orange-400">{ "Submit" }</button>
                 </div>
                 {if let Some(msg) = err_message.as_ref() {
                     html! {

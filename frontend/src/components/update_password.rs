@@ -71,8 +71,8 @@ pub fn update_password() -> Html {
                     <input type="password" oninput={on_password_input} class="p-2 rounded-md" name="password" id="new_password" placeholder="Enter your new password" />
                 </div>
                 <div class="flex justify-between text-sm">
-                    <button type="submit" class="p-1 transition rounded-md bg-sky-500 hover:bg-sky-400">{"Submit"}</button>
-                    <button {onclick} class="transition text-slate-500 hover:text-slate-400">{"Cancel"}</button>
+                    <button type="submit" class="p-1 transition rounded-md bg-sky-500 focus:bg-sky-400 hover:bg-sky-400">{"Submit"}</button>
+                    <button {onclick} class="transition text-slate-500 focus:text-slate-400 hover:text-slate-400">{"Cancel"}</button>
                 </div>
                 {if let Some(msg) = err_message.as_ref() {
                     html! {
@@ -83,7 +83,7 @@ pub fn update_password() -> Html {
                 }}
             </form>
         } else {
-            <button {onclick} class="transition text-sky-500 hover:text-sky-400">{"Update password"}</button>
+            <button {onclick} class="transition text-sky-500 focus:text-sky-400 hover:text-sky-400">{"Update password"}</button>
         }
     }
 }

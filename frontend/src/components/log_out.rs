@@ -24,6 +24,6 @@ pub fn log_out() -> Html {
     };
 
     html! {
-        <button {onclick}>{ "Logout" }</button>
+        <button {onclick} class="transition focus:text-orange-400 hover:text-orange-400">{ "Logout" }</button>
     }
 }
