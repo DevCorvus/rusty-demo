@@ -13,15 +13,15 @@ use crate::{
 pub fn delete_account() -> Html {
     let navigator = use_navigator().unwrap();
     let (store, dispatch) = use_store::<Store>();
-    let err_message = use_state(|| Option::<String>::None);
+    let res_err = use_state(|| Option::<String>::None);
 
     let on_submit = {
-        let err_message = err_message.clone();
+        let res_err = res_err.clone();
 
         Callback::from(move |event: SubmitEvent| {
             let navigator = navigator.clone();
             let dispatch = dispatch.clone();
-            let err_message = err_message.clone();
+            let res_err = res_err.clone();
 
             event.prevent_default();
 
@@ -36,7 +36,7 @@ pub fn delete_account() -> Html {
                             navigator.push(&Route::Home);
                         }
                         Err(e) => {
-                            err_message.set(Some(e));
+                            res_err.set(Some(e));
                         }
                     }
                 });
@@ -49,13 +49,13 @@ pub fn delete_account() -> Html {
             <div>
                 <button type="submit" class="transition text-rose-500 focus:text-rose-400 hover:text-rose-400">{"Delete account"}</button>
             </div>
-            {if let Some(msg) = err_message.as_ref() {
-                    html! {
-                        <p class="text-red-500">{msg}</p>
-                    }
-                } else {
-                    html! {}
-                }}
+            {if let Some(msg) = res_err.as_ref() {
+                html! {
+                    <p class="text-red-500">{msg}</p>
+                }
+            } else {
+                html! {}
+            }}
         </form>
     }
 }

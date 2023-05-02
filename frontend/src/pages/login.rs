@@ -17,22 +17,18 @@ pub fn login() -> Html {
     let (_, dispatch) = use_store::<Store>();
     let email = use_state(String::new);
     let password = use_state(String::new);
-    let err_message = use_state(|| Option::<String>::None);
+    let res_err = use_state(|| Option::<String>::None);
 
     let on_email_input = get_input_handler(&email);
     let on_password_input = get_input_handler(&password);
 
     let on_submit = {
-        let navigator = navigator.clone();
-        let dispatch = dispatch.clone();
-        let email = email.clone();
-        let password = password.clone();
-        let err_message = err_message.clone();
+        let res_err = res_err.clone();
 
         Callback::from(move |event: SubmitEvent| {
             let navigator = navigator.clone();
             let dispatch = dispatch.clone();
-            let err_message = err_message.clone();
+            let res_err = res_err.clone();
 
             event.prevent_default();
 
@@ -49,7 +45,7 @@ pub fn login() -> Html {
                         set_token(Some(data.access_token), dispatch);
                         navigator.push(&Route::Home);
                     }
-                    Err(e) => err_message.set(Some(e)),
+                    Err(e) => res_err.set(Some(e)),
                 }
             });
         })
@@ -72,7 +68,7 @@ pub fn login() -> Html {
                 <div class="mt-2">
                     <button type="submit" class="p-2 transition bg-orange-500 rounded-md focus:bg-orange-400 hover:bg-orange-400">{ "Submit" }</button>
                 </div>
-                {if let Some(msg) = err_message.as_ref() {
+                {if let Some(msg) = res_err.as_ref() {
                     html! {
                         <p class="text-red-500">{msg}</p>
                     }
