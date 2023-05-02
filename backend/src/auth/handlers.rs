@@ -1,5 +1,5 @@
 use crate::{password::compare_password, users};
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{post, web, Error, HttpResponse, Responder};
 
 use common::{LoginDto, LoginResponse};
 
@@ -9,10 +9,11 @@ use crate::{database::DbPool, error::AppError};
 #[post("/login")]
 async fn login(
     pool: web::Data<DbPool>,
-    data: web::Json<LoginDto>,
+    dto: Result<web::Json<LoginDto>, Error>,
 ) -> actix_web::Result<impl Responder> {
-    let user_email = data.email.clone();
+    let data = dto.map_err(|_| AppError::ParseError)?;
 
+    let user_email = data.email.clone();
     let user = web::block(move || {
         let mut conn = pool.get().map_err(|_| AppError::InternalError)?;
 

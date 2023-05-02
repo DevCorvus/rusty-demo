@@ -3,7 +3,7 @@ use crate::{auth::middleware, database::DbPool};
 
 use super::{dto::CreateUserDto, model::User, service};
 use crate::error::{get_validation_error_response, AppError};
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, Error, HttpResponse, Responder};
 use common::{UpdateUserPasswordDto, UserResponse};
 
 #[get("/profile")]
@@ -30,8 +30,9 @@ async fn get_user_profile(
 #[post("/")]
 async fn create_user(
     pool: web::Data<DbPool>,
-    data: web::Json<CreateUserDto>,
+    dto: Result<web::Json<CreateUserDto>, Error>,
 ) -> actix_web::Result<impl Responder> {
+    let data = dto.map_err(|_| AppError::ParseError)?;
     if let Some(res) = get_validation_error_response(data.clone()) {
         return Ok(res);
     }
@@ -66,9 +67,10 @@ async fn create_user(
 #[put("/")]
 async fn update_user_password(
     pool: web::Data<DbPool>,
-    data: web::Json<UpdateUserPasswordDto>,
+    dto: Result<web::Json<UpdateUserPasswordDto>, Error>,
     ctx: middleware::JwtMiddleware,
 ) -> actix_web::Result<impl Responder> {
+    let data = dto.map_err(|_| AppError::ParseError)?;
     if let Some(res) = get_validation_error_response(data.clone()) {
         return Ok(res);
     }

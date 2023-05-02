@@ -8,6 +8,8 @@ use validator::Validate;
 
 #[derive(Error, Debug)]
 pub enum AppError {
+    #[error("Could not parse request data")]
+    ParseError,
     #[error("You are not authorized")]
     Unauthorized,
     #[error("{0} not found")]
@@ -29,6 +31,7 @@ impl ResponseError for AppError {
     }
     fn status_code(&self) -> actix_web::http::StatusCode {
         match *self {
+            Self::ParseError => StatusCode::BAD_REQUEST,
             Self::Unauthorized => StatusCode::UNAUTHORIZED,
             Self::NotFound(_) => StatusCode::NOT_FOUND,
             Self::AlreadyExists(_) => StatusCode::CONFLICT,
