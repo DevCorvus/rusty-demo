@@ -1,5 +1,5 @@
 use anyhow;
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -10,10 +10,12 @@ pub struct JwtClaims {
     pub exp: usize,
 }
 
-pub fn encode_jwt(user_id: i32) -> anyhow::Result<String> {
+pub fn encode_jwt(user_id: i32) -> anyhow::Result<(String, DateTime<Utc>)> {
+    let exp_date = Utc::now() + Duration::hours(24);
+
     let claims = JwtClaims {
         sub: user_id.to_string(),
-        exp: (Utc::now() + Duration::minutes(15)).timestamp() as usize,
+        exp: exp_date.timestamp() as usize,
     };
 
     let header = Header::default(); // HS256
@@ -22,7 +24,7 @@ pub fn encode_jwt(user_id: i32) -> anyhow::Result<String> {
 
     let jwt = encode(&header, &claims, &encoding_key)?;
 
-    Ok(jwt)
+    Ok((jwt, exp_date))
 }
 
 pub fn decode_jwt(token: String) -> anyhow::Result<TokenData<JwtClaims>> {
@@ -53,7 +55,7 @@ mod tests {
     fn test_decode_jwt() -> anyhow::Result<()> {
         dotenv()?;
 
-        let token = encode_jwt(1)?;
+        let (token, _) = encode_jwt(1)?;
         let jwt = decode_jwt(token)?;
         assert_eq!(jwt.claims.sub, "1");
         Ok(())

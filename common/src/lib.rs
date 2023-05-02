@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use validator::Validate;
@@ -55,4 +55,5 @@ pub struct LoginDto {
 #[derive(Serialize, Deserialize)]
 pub struct LoginResponse {
     pub access_token: String,
+    pub access_token_exp: DateTime<Utc>,
 }

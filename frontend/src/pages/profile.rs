@@ -1,4 +1,4 @@
-use chrono::{Local, TimeZone};
+use chrono::{TimeZone, Utc};
 use chrono_humanize::HumanTime;
 use yew::prelude::*;
 
@@ -11,12 +11,12 @@ use crate::{
 fn content() -> HtmlResult {
     let user_profile = use_profile()?;
 
-    let now = Local::now();
+    let now = Utc::now();
 
-    let created_at_parsed = Local.from_local_datetime(&user_profile.created_at).unwrap();
+    let created_at_parsed = Utc.from_local_datetime(&user_profile.created_at).unwrap();
     let member_since = format!("Member since {}", HumanTime::from(created_at_parsed - now));
 
-    let updated_at_parsed = Local.from_local_datetime(&user_profile.updated_at).unwrap();
+    let updated_at_parsed = Utc.from_local_datetime(&user_profile.updated_at).unwrap();
     let last_update_since = format!(
         "Last update since {}",
         HumanTime::from(updated_at_parsed - now)

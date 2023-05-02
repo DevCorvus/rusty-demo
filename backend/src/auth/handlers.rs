@@ -31,9 +31,10 @@ async fn login(
         .map_err(|_| AppError::InternalError)?;
 
     if do_passwords_match {
-        let token = encode_jwt(user.id).map_err(|_| AppError::InternalError)?;
+        let (token, exp) = encode_jwt(user.id).map_err(|_| AppError::InternalError)?;
         Ok(HttpResponse::Created().json(LoginResponse {
             access_token: token,
+            access_token_exp: exp,
         }))
     } else {
         Err(AppError::Unauthorized.into())
