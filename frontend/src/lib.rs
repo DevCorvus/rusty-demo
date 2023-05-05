@@ -5,4 +5,5 @@ pub mod layout;
 pub mod pages;
 pub mod router;
 pub mod store;
+pub mod tauri_bridge;
 pub mod utils;

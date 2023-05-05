@@ -1,5 +1,5 @@
-use frontend::layout::Layout;
-use frontend::router::{switch, Route};
+use tauri_app_ui::layout::Layout;
+use tauri_app_ui::router::{switch, Route};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
