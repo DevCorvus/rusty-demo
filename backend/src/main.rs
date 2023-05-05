@@ -1,5 +1,5 @@
 use actix_cors::Cors;
-use actix_web::{get, http::header, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use backend::{auth, database, users};
 use dotenvy::dotenv;
 
@@ -15,10 +15,7 @@ async fn main() -> std::io::Result<()> {
     let pool = database::connect_sqlite();
 
     HttpServer::new(move || {
-        let cors = Cors::default()
-            .allowed_origin("http://localhost:3000")
-            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
-            .allowed_headers(vec![header::CONTENT_TYPE, header::AUTHORIZATION]);
+        let cors = Cors::permissive();
 
         App::new()
             .app_data(web::Data::new(pool.clone()))
